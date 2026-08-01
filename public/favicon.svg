@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-128 -128 768 768">
+  <rect x="-1000" y="-1000" width="3000" height="3000" fill="#000000" />
+  
+  <g stroke="#ffffff" fill="none" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Shield Outline -->
+    <path d="M256,40 C180,40 140,56 140,56 L140,220 C140,340 256,376 256,376 C256,376 372,340 372,220 L372,56 C372,56 332,40 256,40 Z" stroke-width="24" />
+    
+    <!-- Code Brackets < > -->
+    <path d="M 216,160 L 168,208 L 216,256 M 296,160 L 344,208 L 296,256" stroke-width="32" />
+  </g>
+  
+  <!-- Left Hand -->
+  <path fill="#ffffff" d="M140,240 C100,240 80,300 80,340 C80,400 180,440 230,440 C230,440 260,410 220,360 C190,320 180,280 140,240 Z" />
+  
+  <!-- Right Hand -->
+  <path fill="#ffffff" d="M372,240 C412,240 432,300 432,340 C432,400 332,440 282,440 C282,440 252,410 292,360 C322,320 332,280 372,240 Z" />
+
+  <!-- Hacker's Unity Text -->
+  <text x="256" y="490" font-family="Impact, Arial Black, sans-serif" font-weight="900" font-style="italic" font-size="64" text-anchor="middle" letter-spacing="1">
+    <tspan fill="#00baff">Hacker's </tspan>
+    <tspan fill="#ff9900">Unity</tspan>
+  </text>
+</svg>
