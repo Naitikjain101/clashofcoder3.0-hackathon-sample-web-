@@ -152,7 +152,7 @@ export function CrashIntro({ onDone }: { onDone: () => void }) {
           >
             {/* Warp speed streaks */}
             <div className="absolute inset-0 overflow-hidden">
-              {Array.from({ length: 50 }).map((_, i) => {
+              {Array.from({ length: 20 }).map((_, i) => {
                 const angle = Math.random() * Math.PI * 2;
                 const radius = 5 + Math.random() * 95;
                 const length = 50 + Math.random() * 200;

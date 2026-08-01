@@ -81,9 +81,9 @@ const createHighResRingTexture = () => {
 };
 
 // 2. Continuous Disk Mesh
-function DenseRingDisk({ inner, outer, texture }: { inner: number, outer: number, texture: THREE.Texture | null }) {
+function DenseRingDisk({ inner, outer, texture, segments = 256 }: { inner: number, outer: number, texture: THREE.Texture | null, segments?: number }) {
   const geo = useMemo(() => {
-    const geometry = new THREE.RingGeometry(inner, outer, 256);
+    const geometry = new THREE.RingGeometry(inner, outer, segments);
     const pos = geometry.attributes.position;
     const uv = geometry.attributes.uv;
     
@@ -96,7 +96,7 @@ function DenseRingDisk({ inner, outer, texture }: { inner: number, outer: number
       uv.setXY(i, u, 0.5);
     }
     return geometry;
-  }, [inner, outer]);
+  }, [inner, outer, segments]);
 
   return (
     <mesh geometry={geo} castShadow receiveShadow>
@@ -205,13 +205,13 @@ export function CinematicRings() {
   
   const texture = useMemo(() => createHighResRingTexture(), []);
   
-  // 250k particles on Desktop, 60k on Phone
-  const particleCount = phone ? 60000 : 250000;
+  // 250k particles on Desktop, 8k on Phone (dramatically reduced to prevent lag)
+  const particleCount = phone ? 8000 : 250000;
 
   return (
     <group>
       {/* The solid, mathematically perfect base layer */}
-      <DenseRingDisk inner={2.2} outer={5.5} texture={texture} />
+      <DenseRingDisk inner={2.2} outer={5.5} texture={texture} segments={phone ? 64 : 256} />
       
       {/* The massive point cloud layer for incredible 3D parallax */}
       <DustVolumetrics inner={2.2} outer={5.5} count={particleCount} />

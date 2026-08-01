@@ -66,9 +66,9 @@ const createBlackHoleAccretionTexture = () => {
 };
 
 // 2. Continuous Disk Mesh
-function AccretionDiskBase({ inner, outer, texture }: { inner: number, outer: number, texture: THREE.Texture | null }) {
+function AccretionDiskBase({ inner, outer, texture, segments = 256 }: { inner: number, outer: number, texture: THREE.Texture | null, segments?: number }) {
   const geo = useMemo(() => {
-    const geometry = new THREE.RingGeometry(inner, outer, 256);
+    const geometry = new THREE.RingGeometry(inner, outer, segments);
     const pos = geometry.attributes.position;
     const uv = geometry.attributes.uv;
     
@@ -80,7 +80,7 @@ function AccretionDiskBase({ inner, outer, texture }: { inner: number, outer: nu
       uv.setXY(i, u, 0.5);
     }
     return geometry;
-  }, [inner, outer]);
+  }, [inner, outer, segments]);
 
   return (
     <mesh geometry={geo}>
@@ -190,15 +190,16 @@ export function BlackHoleAccretion() {
   
   const texture = useMemo(() => createBlackHoleAccretionTexture(), []);
   
-  const mult = phone ? 0.3 : 1;
+  // Phone: 0.08x multiplier (~14k total particles) vs Desktop: 1x (~180k)
+  const mult = phone ? 0.08 : 1;
 
   return (
     <group>
-      <AccretionDiskBase inner={5.2} outer={22} texture={texture} />
+      <AccretionDiskBase inner={5.2} outer={22} texture={texture} segments={phone ? 64 : 256} />
       {/* Differential Rotation: Inner parts spin much faster than outer parts */}
-      <PlasmaVolumetrics inner={5.2} outer={7.5} count={80000 * mult} speed={0.5} />
-      <PlasmaVolumetrics inner={7.5} outer={12.0} count={60000 * mult} speed={0.24} />
-      <PlasmaVolumetrics inner={12.0} outer={22.0} count={40000 * mult} speed={0.08} />
+      <PlasmaVolumetrics inner={5.2} outer={7.5} count={Math.round(80000 * mult)} speed={0.5} />
+      <PlasmaVolumetrics inner={7.5} outer={12.0} count={Math.round(60000 * mult)} speed={0.24} />
+      <PlasmaVolumetrics inner={12.0} outer={22.0} count={Math.round(40000 * mult)} speed={0.08} />
     </group>
   );
 }

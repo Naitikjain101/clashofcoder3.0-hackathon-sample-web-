@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useReducedMotion } from "@/hooks/use-prefs";
+import { useReducedMotion, useIsPhone } from "@/hooks/use-prefs";
 
 export function GlitchOverlay() {
   const [glitching, setGlitching] = useState(false);
   const reduced = useReducedMotion();
+  const phone = useIsPhone();
 
   useEffect(() => {
     if (reduced) return;
@@ -44,7 +45,8 @@ export function GlitchOverlay() {
           rgba(255,255,255,0.05) 1px,
           rgba(0,0,0,0) 2px
         )`,
-        backdropFilter: "contrast(1.5) hue-rotate(90deg) saturate(2)",
+        // Avoid expensive backdropFilter on phone — it causes massive frame drops
+        ...(phone ? {} : { backdropFilter: "contrast(1.5) hue-rotate(90deg) saturate(2)" }),
         transform: `translate(${Math.random() * 10 - 5}px, ${Math.random() * 10 - 5}px)`,
         opacity: Math.random() * 0.5 + 0.5
       }}
