@@ -216,7 +216,8 @@
     oklch(1 0 0 / 2%)
   );
   border: 1px solid oklch(1 0 0 / 10%);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px) brightness(0.6) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) brightness(0.6) saturate(130%);
   box-shadow: var(--shadow-glass);
 }
 
@@ -237,6 +238,26 @@
   opacity: 0.05;
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════════════
+   Readability utilities
+   ═══════════════════════════════════════════════════════ */
+
+/** Strong drop shadow for text placed directly over the animation */
+@utility text-readable {
+  text-shadow:
+    0 1px 4px oklch(0 0 0 / 0.95),
+    0 2px 16px oklch(0 0 0 / 0.8);
+}
+
+/** Adaptive contrast mask for naked text. Creates an invisible dark cloud immediately behind the letters to absorb bright 3D elements. */
+@utility safe-read {
+  text-shadow:
+    0 1px 4px oklch(0 0 0 / 1),
+    0 2px 12px oklch(0 0 0 / 0.9),
+    0 4px 24px oklch(0 0 0 / 0.8);
+  background: radial-gradient(ellipse at center, rgba(3,4,15,0.7) 10%, rgba(3,4,15,0.3) 45%, transparent 75%);
 }
 
 /* Hide Lovable badge */

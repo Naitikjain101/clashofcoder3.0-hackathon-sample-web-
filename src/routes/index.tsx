@@ -10,7 +10,7 @@ import { Prizes } from "@/components/Prizes";
 import { Sponsors } from "@/components/Sponsors";
 import { Stats } from "@/components/Stats";
 import { Timeline } from "@/components/Timeline";
-import { TopBar } from "@/components/TopBar";
+import { Navbar } from "@/components/Navbar";
 import { Tracks } from "@/components/Tracks";
 import { lazy, Suspense } from "react";
 const Starfield = lazy(() => import("@/components/space/Starfield").then((m) => ({ default: m.Starfield })));
@@ -50,7 +50,7 @@ function Index() {
             <Starfield />
           </Suspense>
           <div className="grain-overlay" aria-hidden />
-          <TopBar />
+          <Navbar />
           <main>
             <Hero />
             <HallOfFame />

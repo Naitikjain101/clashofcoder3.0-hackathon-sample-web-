@@ -60,7 +60,7 @@ const createSaturnTexture = () => {
     
     baseColorIdx = Math.max(0, Math.min(colors.length - 1, baseColorIdx));
     
-    ctx.fillStyle = colors[baseColorIdx];
+    ctx.fillStyle = colors[baseColorIdx] || "#ffffff";
     ctx.globalAlpha = 0.9;
     ctx.fillRect(0, y, 1024, 1);
   }
@@ -142,7 +142,7 @@ function CameraController() {
     currentProgress.current = THREE.MathUtils.damp(
       currentProgress.current,
       scrollProgress.current,
-      3.5, // lambda
+      2.5, // lambda — lower = more inertia, smoother/more cinematic
       delta
     );
 
@@ -215,6 +215,7 @@ function Meteors() {
     if (!meshRef.current) return;
     for (let i = 0; i < count; i++) {
       const m = meteors[i];
+      if (!m) continue;
       m.timer -= delta;
       if (!m.active && m.timer <= 0) {
         m.active = true;
@@ -253,13 +254,13 @@ function LivingBackground({ phone }: { phone: boolean }) {
       <Stars radius={120} depth={60} count={phone ? 200 : 2000} factor={7} saturation={1} fade speed={0.3} />
       
       {/* Vibrant Galaxy Core — reduced on phone to prevent GPU overload */}
-      <Sparkles count={phone ? 10 : 60} scale={[100, 60, 60]} size={60} color="#ff007f" speed={0.05} opacity={0.15} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
-      <Sparkles count={phone ? 10 : 70} scale={[80, 80, 40]} size={80} color="#6600ff" speed={0.06} opacity={0.12} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
-      {!phone && <Sparkles count={50} scale={[120, 40, 80]} size={100} color="#00ffff" speed={0.04} opacity={0.1} transparent blending={THREE.AdditiveBlending} depthWrite={false} />}
+      <Sparkles count={phone ? 8 : 50} scale={[100, 60, 60]} size={45} color="#7722ff" speed={0.05} opacity={0.08} />
+      <Sparkles count={phone ? 8 : 60} scale={[80, 80, 40]} size={70} color="#5500cc" speed={0.06} opacity={0.08} />
+      {!phone && <Sparkles count={40} scale={[120, 40, 80]} size={90} color="#00ddff" speed={0.04} opacity={0.07} />}
       
       {/* Nebula Fog / Cosmic Dust — heavily reduced on phone */}
-      <Sparkles count={phone ? 20 : 200} scale={[70, 50, 50]} size={30} color="#9d4edd" speed={0.1} opacity={0.15} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
-      {!phone && <Sparkles count={150} scale={[60, 60, 40]} size={40} color="#00f3ff" speed={0.15} opacity={0.1} transparent blending={THREE.AdditiveBlending} depthWrite={false} />}
+      <Sparkles count={phone ? 15 : 180} scale={[70, 50, 50]} size={25} color="#7733cc" speed={0.1} opacity={0.1} />
+      {!phone && <Sparkles count={120} scale={[60, 60, 40]} size={35} color="#00ddff" speed={0.15} opacity={0.08} />}
       
       {/* Ambient background dust */}
       <Sparkles count={phone ? 80 : 600} scale={[100, 100, 100]} size={2} color="#ffffff" speed={0.05} opacity={0.3} />
@@ -364,28 +365,30 @@ function Universe() {
 
     // Warp lines scrolling
     if (warpTunnelRef.current) {
-      const pos = warpTunnelRef.current.geometry.attributes.position!;
+      const pos = warpTunnelRef.current.geometry.attributes['position'] as THREE.BufferAttribute;
       const arr = pos.array as Float32Array;
-      for (let i = 2; i < arr.length; i += 6) {
-        // Move lines closer on Z axis
-        arr[i] += 0.42;
-        arr[i + 3] += 0.42;
-
-        // Reset once they pass camera
-        if (arr[i] > 10) {
-          const z = -30 - Math.random() * 10;
-          const r = 2.0 + Math.random() * 1.5;
-          const theta = Math.random() * Math.PI * 2;
-          const x = Math.cos(theta) * r;
-          const y = Math.sin(theta) * r;
-          const len = 1.5 + Math.random() * 4;
-
-          arr[i - 2] = x;
-          arr[i - 1] = y;
-          arr[i] = z;
-          arr[i + 1] = x;
-          arr[i + 2] = y;
-          arr[i + 3] = z - len;
+      if (arr) {
+        for (let i = 2; i < arr.length; i += 6) {
+          // Move lines closer on Z axis
+          arr[i] = (arr[i] ?? 0) + 0.42;
+          arr[i + 3] = (arr[i + 3] ?? 0) + 0.42;
+  
+          // Reset once they pass camera
+          if (arr[i]! > 10) {
+            const z = -30 - Math.random() * 10;
+            const r = 2.0 + Math.random() * 1.5;
+            const theta = Math.random() * Math.PI * 2;
+            const x = Math.cos(theta) * r;
+            const y = Math.sin(theta) * r;
+            const len = 1.5 + Math.random() * 4;
+  
+            arr[i - 2] = x;
+            arr[i - 1] = y;
+            arr[i] = z;
+            arr[i + 1] = x;
+            arr[i + 2] = y;
+            arr[i + 3] = z - len;
+          }
         }
       }
       pos.needsUpdate = true;
@@ -428,9 +431,9 @@ function Universe() {
         {/* Independent clouds layer */}
         <mesh ref={cloudRef}>
           <sphereGeometry args={[2.015, phone ? 16 : 32, phone ? 16 : 32]} />
-          {textures.clouds ? (
+          {(textures as any).clouds ? (
             <meshStandardMaterial
-              map={textures.clouds}
+              map={(textures as any).clouds}
               transparent
               opacity={0.35}
               blending={THREE.AdditiveBlending}
@@ -470,7 +473,7 @@ function Universe() {
       {/* 4. Warp Tunnel (shifted far right and down) */}
       <lineSegments ref={warpTunnelRef} geometry={warpLines} position={[40, -20, 0]}>
         <lineBasicMaterial
-          color="oklch(0.79 0.14 205)"
+          color="#00d4e8"
           transparent
           opacity={0.4}
           blending={THREE.AdditiveBlending}
@@ -481,13 +484,13 @@ function Universe() {
       <group ref={blackHoleRef} position={[40, -20, -35]}>
         {/* The Event Horizon (Pitch Black Sphere) */}
         <mesh>
-          <sphereGeometry args={[5, phone ? 24 : 64, phone ? 24 : 64]} />
+          <sphereGeometry args={[3, phone ? 24 : 64, phone ? 24 : 64]} />
           <meshBasicMaterial color="#000000" />
         </mesh>
         
         {/* Photon Sphere / Halo (Subtle glow right at the edge) */}
         <mesh>
-          <sphereGeometry args={[5.2, phone ? 24 : 64, phone ? 24 : 64]} />
+          <sphereGeometry args={[3.12, phone ? 24 : 64, phone ? 24 : 64]} />
           <meshBasicMaterial color="#ff7700" transparent opacity={0.12} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
         </mesh>
 
@@ -495,7 +498,7 @@ function Universe() {
         <group rotation={[Math.PI / 2.2, 0, 0]}>
           <BlackHoleAccretion />
         </group>
-        <pointLight color="#ff5500" intensity={2.5} distance={80} />
+        <pointLight color="#ff5500" intensity={1.5} distance={50} />
       </group>
     </group>
   );
@@ -519,6 +522,13 @@ export function SpaceScene() {
           antialias: false,
           powerPreference: "high-performance",
           alpha: true,
+          // Prevent alpha-bleed color artifacts on mobile WebGL implementations.
+          // premultipliedAlpha:false ensures the compositor doesn't multiply RGB by A
+          // before writing to the framebuffer, which stops additive overdraws from
+          // creating a colour tint on lower-end GPUs.
+          premultipliedAlpha: false,
+          // Disable logarithmic depth to avoid precision issues on Android Mali/Adreno.
+          logarithmicDepthBuffer: false,
         }}
         camera={{ fov: phone ? 55 : 45, near: 0.1, far: 200, position: [0, 2, 9] }}
       >

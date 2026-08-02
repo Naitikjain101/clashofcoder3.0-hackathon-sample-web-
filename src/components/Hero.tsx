@@ -34,16 +34,16 @@ export function Hero() {
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 28, scale: 0.95 },
+    hidden: { opacity: 0, y: 22, scale: 0.97 },
     visible: {
       opacity: 1,
       y: 0,
       scale: 1,
       transition: {
-        type: "spring",
-        stiffness: 110,
-        damping: 15,
-        mass: 0.8,
+        type: "spring" as const,
+        stiffness: 85,
+        damping: 18,
+        mass: 0.9,
       },
     },
   };
@@ -91,7 +91,7 @@ export function Hero() {
             
             <motion.h1
               variants={itemVariants}
-              className="font-display mt-4 text-[2.75rem] font-bold leading-[0.95] tracking-tight text-glow sm:text-7xl md:text-8xl"
+              className="font-display mt-4 text-[2.75rem] font-bold leading-[0.95] tracking-tight text-glow sm:text-7xl md:text-8xl safe-read"
             >
               Clash of
               <br />
@@ -100,7 +100,7 @@ export function Hero() {
             
             <motion.p
               variants={itemVariants}
-              className="mt-5 max-w-md text-base text-muted-foreground sm:text-lg"
+              className="mt-5 max-w-md text-base text-muted-foreground sm:text-lg safe-read inline-block"
             >
               A 24-hour hackathon · {DATES.displayRange}
               <br />

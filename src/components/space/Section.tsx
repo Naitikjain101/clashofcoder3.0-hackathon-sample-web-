@@ -22,10 +22,20 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn("relative overflow-hidden px-5 py-20 sm:px-8 md:py-32", className)}
+      className={cn("relative isolate overflow-hidden px-5 py-20 sm:px-8 md:py-32", className)}
     >
       <Nebula variant={backdrop} />
-      <div className="mx-auto w-full max-w-6xl">
+      {/* Content scrim: gives all text a reliable dark backdrop over the 3D animation */}
+      <div className="relative isolate mx-auto w-full max-w-6xl z-10 flex flex-col">
+        {/* Macro Safe Reading Zone Mask — Dims Saturn and particles in the core reading column */}
+        <div 
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            background: "radial-gradient(ellipse at center, rgba(3,4,15,0.7) 0%, rgba(3,4,15,0.4) 60%, transparent 100%)",
+            margin: "-100px", // extend past the content bounds slightly
+          }}
+          aria-hidden
+        />
         {(eyebrow || title) && (
           <Reveal>
             <header className="mb-10 md:mb-16">
@@ -35,7 +45,7 @@ export function Section({
                 </p>
               )}
               {title && (
-                <h2 className="font-display mt-3 text-3xl font-bold leading-tight text-glow sm:text-4xl md:text-5xl">
+                <h2 className="font-display mt-3 text-3xl font-bold leading-tight text-glow sm:text-4xl md:text-5xl [text-shadow:0_2px_20px_rgba(0,0,0,0.9),0_0_28px_var(--violet-glow)]">
                   {title}
                 </h2>
               )}
@@ -64,10 +74,10 @@ export function Reveal({
   return (
     <motion.div
       className={className}
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.75, delay, ease: [0.16, 1, 0.3, 1] }}
     >
       {children}
     </motion.div>

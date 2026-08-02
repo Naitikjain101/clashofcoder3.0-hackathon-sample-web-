@@ -66,16 +66,76 @@ export const STATS = [
 
 // TODO: replace placeholder one-liners with final track briefs.
 export const TRACKS = [
-  { name: "Artificial Intelligence", short: "AI", desc: "Build intelligent systems that learn, predict and adapt." },
-  { name: "Web Development", short: "Web", desc: "Ship fast, accessible products for the open web." },
-  { name: "Cybersecurity", short: "Sec", desc: "Defend systems, break assumptions, patch the gaps." },
-  { name: "Blockchain & Web3", short: "Web3", desc: "Trustless apps, on-chain ownership and open protocols." },
-  { name: "Healthcare", short: "Health", desc: "Tech that improves diagnosis, access and patient care." },
-  { name: "FinTech", short: "Fin", desc: "Reinvent payments, lending and financial inclusion." },
-  { name: "EdTech", short: "Edu", desc: "Make learning personal, measurable and reachable." },
-  { name: "Sustainability", short: "Green", desc: "Climate, energy and resource solutions that scale." },
-  { name: "Open Innovation", short: "Open", desc: "No brief, no limits — solve a problem you care about." },
-  { name: "IoT & Robotics", short: "IoT", desc: "Connect the physical world to intelligent software." },
+  { 
+    name: "Artificial Intelligence", 
+    short: "AI", 
+    desc: "Build intelligent systems that learn, predict and adapt.",
+    about: "Dive into the world of machine learning, neural networks, and generative models. Create solutions that reason, learn from data, and automate complex tasks.",
+    bullets: ["Generative AI tools", "Predictive analytics", "Autonomous agents", "Computer vision pipelines"]
+  },
+  { 
+    name: "Web Development", 
+    short: "Web", 
+    desc: "Ship fast, accessible products for the open web.",
+    about: "Focus on creating seamless, highly interactive, and performant web applications. Push the boundaries of modern frameworks and browser capabilities.",
+    bullets: ["Real-time collaboration apps", "Accessible web interfaces", "Progressive Web Apps (PWAs)", "High-performance dashboards"]
+  },
+  { 
+    name: "Cybersecurity", 
+    short: "Sec", 
+    desc: "Defend systems, break assumptions, patch the gaps.",
+    about: "Tackle the ever-evolving landscape of digital threats. Build robust tools to protect data privacy, secure networks, and identify vulnerabilities.",
+    bullets: ["Threat detection systems", "Secure authentication flows", "Network vulnerability scanners", "Phishing prevention tools"]
+  },
+  { 
+    name: "Blockchain & Web3", 
+    short: "Web3", 
+    desc: "Trustless apps, on-chain ownership and open protocols.",
+    about: "Explore decentralized technologies to build transparent, censorship-resistant applications. Redefine digital ownership and decentralized finance.",
+    bullets: ["Decentralized finance (DeFi)", "Smart contract auditing", "Web3 identity solutions", "NFT marketplaces"]
+  },
+  { 
+    name: "Healthcare", 
+    short: "Health", 
+    desc: "Tech that improves diagnosis, access and patient care.",
+    about: "Leverage technology to solve critical challenges in the medical field. Build solutions that empower doctors and improve patient outcomes globally.",
+    bullets: ["AI-powered diagnosis", "Smart hospital systems", "Telemedicine solutions", "Healthcare accessibility"]
+  },
+  { 
+    name: "FinTech", 
+    short: "Fin", 
+    desc: "Reinvent payments, lending and financial inclusion.",
+    about: "Transform how the world interacts with money. Develop innovative financial products that increase security, transparency, and accessibility.",
+    bullets: ["Peer-to-peer lending platforms", "Automated investment bots", "Fraud detection algorithms", "Cross-border payment gateways"]
+  },
+  { 
+    name: "EdTech", 
+    short: "Edu", 
+    desc: "Make learning personal, measurable and reachable.",
+    about: "Redefine the educational experience through technology. Build platforms that make learning more engaging, equitable, and effective for everyone.",
+    bullets: ["Personalized learning paths", "Interactive virtual classrooms", "AI tutoring systems", "Gamified education platforms"]
+  },
+  { 
+    name: "Sustainability", 
+    short: "Green", 
+    desc: "Climate, energy and resource solutions that scale.",
+    about: "Address pressing environmental challenges with tech. Create systems that optimize resource usage, reduce emissions, and promote green practices.",
+    bullets: ["Carbon footprint trackers", "Renewable energy monitors", "Smart waste management", "Eco-friendly supply chains"]
+  },
+  { 
+    name: "Open Innovation", 
+    short: "Open", 
+    desc: "No brief, no limits — solve a problem you care about.",
+    about: "Bring your wildest ideas to life. This track is a sandbox for cross-disciplinary projects, moonshots, and out-of-the-box prototypes.",
+    bullets: ["Interdisciplinary solutions", "Novel community tools", "Experimental prototypes", "Moonshot ideas"]
+  },
+  { 
+    name: "IoT & Robotics", 
+    short: "IoT", 
+    desc: "Connect the physical world to intelligent software.",
+    about: "Bridge the gap between hardware and software. Develop smart, connected devices and automated systems that interact with the physical environment.",
+    bullets: ["Smart home automation", "Industrial sensor networks", "Autonomous delivery drones", "Agricultural monitoring systems"]
+  },
 ];
 
 // TODO: replace placeholder times with the confirmed run-of-show.
@@ -160,12 +220,10 @@ export const FAQS = [
 ];
 
 export const NAV_SECTIONS = [
-  { id: "about", label: "About" },
-  { id: "hall-of-fame", label: "Hall of Fame" },
+  { id: "about", label: "Mission" },
   { id: "tracks", label: "Tracks" },
-  { id: "timeline", label: "Timeline" },
+  { id: "timeline", label: "Run of Show" },
   { id: "prizes", label: "Prizes" },
-  { id: "guests", label: "Guests" },
   { id: "sponsors", label: "Sponsors" },
   { id: "faq", label: "FAQs" },
   { id: "venue", label: "Venue" },

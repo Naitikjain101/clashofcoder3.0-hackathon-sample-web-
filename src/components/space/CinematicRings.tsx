@@ -84,8 +84,8 @@ const createHighResRingTexture = () => {
 function DenseRingDisk({ inner, outer, texture, segments = 256 }: { inner: number, outer: number, texture: THREE.Texture | null, segments?: number }) {
   const geo = useMemo(() => {
     const geometry = new THREE.RingGeometry(inner, outer, segments);
-    const pos = geometry.attributes.position;
-    const uv = geometry.attributes.uv;
+    const pos = geometry.attributes['position'] as THREE.BufferAttribute;
+    const uv = geometry.attributes['uv'] as THREE.BufferAttribute;
     
     // Remap UVs so radius maps to U directly
     for (let i = 0; i < pos.count; i++) {

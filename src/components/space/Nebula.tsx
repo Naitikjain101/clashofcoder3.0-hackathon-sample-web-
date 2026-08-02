@@ -10,11 +10,11 @@ type Props = {
 };
 
 const TINTS: Record<NonNullable<Props["variant"]>, [string, string]> = {
-  violet: ["oklch(0.54 0.26 292.6 / 0.35)", "oklch(0.63 0.22 303 / 0.22)"],
-  asteroid: ["oklch(0.45 0.09 265 / 0.35)", "oklch(0.55 0.12 250 / 0.18)"],
-  gold: ["oklch(0.78 0.14 85 / 0.22)", "oklch(0.54 0.26 292.6 / 0.28)"],
-  constellation: ["oklch(0.6 0.18 265 / 0.28)", "oklch(0.79 0.14 205 / 0.16)"],
-  cyan: ["oklch(0.79 0.14 205 / 0.22)", "oklch(0.54 0.26 292.6 / 0.3)"],
+  violet: ["oklch(0.54 0.26 292.6 / 0.2)", "oklch(0.63 0.22 303 / 0.14)"],
+  asteroid: ["oklch(0.45 0.09 265 / 0.2)", "oklch(0.55 0.12 250 / 0.12)"],
+  gold: ["oklch(0.78 0.14 85 / 0.14)", "oklch(0.54 0.26 292.6 / 0.18)"],
+  constellation: ["oklch(0.6 0.18 265 / 0.18)", "oklch(0.79 0.14 205 / 0.10)"],
+  cyan: ["oklch(0.79 0.14 205 / 0.14)", "oklch(0.54 0.26 292.6 / 0.18)"],
 };
 
 /** Layered soft-gradient depth. Parallaxes on scroll; static when reduced. */
@@ -40,14 +40,14 @@ export function Nebula({ variant = "violet", className }: Props) {
           ...(reduced ? {} : { y: y1 }),
           background: `radial-gradient(closest-side, ${a}, transparent 70%)`,
         }}
-        className="absolute -left-[20%] top-[-10%] h-[70vh] w-[80vw] rounded-full blur-[60px] md:blur-[90px]"
+        className="absolute -left-[20%] top-[-10%] h-[70vh] w-[80vw] rounded-full blur-[50px] md:blur-[70px]"
       />
       <motion.div
         style={{
           ...(reduced ? {} : { y: y2 }),
           background: `radial-gradient(closest-side, ${b}, transparent 70%)`,
         }}
-        className="absolute -right-[25%] bottom-[-15%] h-[60vh] w-[75vw] rounded-full blur-[60px] md:blur-[90px]"
+        className="absolute -right-[25%] bottom-[-15%] h-[60vh] w-[75vw] rounded-full blur-[50px] md:blur-[70px]"
       />
     </div>
   );
