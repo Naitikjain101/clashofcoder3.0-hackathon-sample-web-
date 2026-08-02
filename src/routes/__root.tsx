@@ -126,6 +126,30 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    // Unregister any old Service Workers that might be serving stale cached versions
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const registration of registrations) {
+          registration.unregister().then((boolean) => {
+            if (boolean) {
+              console.log("Successfully unregistered stale service worker.");
+            }
+          });
+        }
+      });
+    }
+
+    // Force clear Cache API storage to prevent old index.html/assets from being loaded
+    if (typeof window !== "undefined" && "caches" in window) {
+      caches.keys().then((names) => {
+        for (const name of names) {
+          caches.delete(name);
+        }
+      });
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}

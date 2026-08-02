@@ -3,16 +3,18 @@ import { Stars, Sparkles, PerformanceMonitor } from "@react-three/drei";
 import { useEffect, useMemo, useRef, Suspense, useState } from "react";
 import * as THREE from "three";
 import { useLenis } from "@/hooks/use-lenis";
-import { useReducedMotion, useIsPhone } from "@/hooks/use-prefs";
+import { useReducedMotion } from "@/hooks/use-prefs";
+import { usePerformanceTier, PerformanceTier } from "@/hooks/use-performance";
 import { CinematicRings } from "./CinematicRings";
 import { BlackHoleAccretion } from "./BlackHole";
 
 // Dynamic texture creators to avoid loading external image assets.
-const createSaturnTexture = () => {
+const createSaturnTexture = (tier: PerformanceTier) => {
   if (typeof document === "undefined") return null;
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 1024;
+  const size = tier === "high" ? 2048 : tier === "medium" ? 1024 : 512;
+  canvas.width = size;
+  canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
@@ -30,8 +32,8 @@ const createSaturnTexture = () => {
     "#4a5356"
   ];
 
-  for (let y = 0; y < 1024; y++) {
-    const v = y / 1024;
+  for (let y = 0; y < size; y++) {
+    const v = y / size;
     
     // Complex noise function combining multiple sine waves for bands
     let noise = 
@@ -62,18 +64,18 @@ const createSaturnTexture = () => {
     
     ctx.fillStyle = colors[baseColorIdx] || "#ffffff";
     ctx.globalAlpha = 0.9;
-    ctx.fillRect(0, y, 1024, 1);
+    ctx.fillRect(0, y, size, 1);
   }
   
   // Apply a smooth gradient over it for polar lighting/color shift
   ctx.globalAlpha = 1.0;
-  const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+  const grad = ctx.createLinearGradient(0, 0, 0, size);
   grad.addColorStop(0, "rgba(70, 90, 110, 0.5)"); // North pole blue tint
   grad.addColorStop(0.15, "rgba(255, 255, 255, 0.0)");
   grad.addColorStop(0.85, "rgba(255, 255, 255, 0.0)");
   grad.addColorStop(1, "rgba(70, 90, 110, 0.5)"); // South pole blue tint
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, 1024, 1024);
+  ctx.fillRect(0, 0, size, size);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -245,34 +247,37 @@ function Meteors() {
   );
 }
 
-function LivingBackground({ phone }: { phone: boolean }) {
+function LivingBackground({ tier }: { tier: PerformanceTier }) {
+  const isLow = tier === "low";
+  const isHigh = tier === "high";
+
   return (
     <group>
       {/* Deep Galaxy Stars */}
-      <Stars radius={100} depth={50} count={phone ? 400 : 3000} factor={4} saturation={0} fade speed={0.5} />
+      <Stars radius={100} depth={50} count={isLow ? 200 : isHigh ? 3000 : 1000} factor={4} saturation={0} fade speed={0.5} />
       {/* Colored Star Clusters */}
-      <Stars radius={120} depth={60} count={phone ? 200 : 2000} factor={7} saturation={1} fade speed={0.3} />
+      <Stars radius={120} depth={60} count={isLow ? 100 : isHigh ? 2000 : 800} factor={7} saturation={1} fade speed={0.3} />
       
-      {/* Vibrant Galaxy Core — reduced on phone to prevent GPU overload */}
-      <Sparkles count={phone ? 8 : 50} scale={[100, 60, 60]} size={45} color="#7722ff" speed={0.05} opacity={0.08} />
-      <Sparkles count={phone ? 8 : 60} scale={[80, 80, 40]} size={70} color="#5500cc" speed={0.06} opacity={0.08} />
-      {!phone && <Sparkles count={40} scale={[120, 40, 80]} size={90} color="#00ddff" speed={0.04} opacity={0.07} />}
+      {/* Vibrant Galaxy Core */}
+      <Sparkles count={isLow ? 5 : isHigh ? 50 : 20} scale={[100, 60, 60]} size={45} color="#7722ff" speed={0.05} opacity={0.08} />
+      <Sparkles count={isLow ? 5 : isHigh ? 60 : 25} scale={[80, 80, 40]} size={70} color="#5500cc" speed={0.06} opacity={0.08} />
+      {isHigh && <Sparkles count={40} scale={[120, 40, 80]} size={90} color="#00ddff" speed={0.04} opacity={0.07} />}
       
-      {/* Nebula Fog / Cosmic Dust — heavily reduced on phone */}
-      <Sparkles count={phone ? 15 : 180} scale={[70, 50, 50]} size={25} color="#7733cc" speed={0.1} opacity={0.1} />
-      {!phone && <Sparkles count={120} scale={[60, 60, 40]} size={35} color="#00ddff" speed={0.15} opacity={0.08} />}
+      {/* Nebula Fog / Cosmic Dust */}
+      <Sparkles count={isLow ? 10 : isHigh ? 180 : 60} scale={[70, 50, 50]} size={25} color="#7733cc" speed={0.1} opacity={0.1} />
+      {isHigh && <Sparkles count={120} scale={[60, 60, 40]} size={35} color="#00ddff" speed={0.15} opacity={0.08} />}
       
       {/* Ambient background dust */}
-      <Sparkles count={phone ? 80 : 600} scale={[100, 100, 100]} size={2} color="#ffffff" speed={0.05} opacity={0.3} />
+      <Sparkles count={isLow ? 30 : isHigh ? 600 : 200} scale={[100, 100, 100]} size={2} color="#ffffff" speed={0.05} opacity={0.3} />
 
-      {!phone && <Satellite />}
-      {!phone && <Meteors />}
+      {!isLow && <Satellite />}
+      {!isLow && <Meteors />}
     </group>
   );
 }
 
 function Universe() {
-  const phone = useIsPhone();
+  const tier = usePerformanceTier();
   const saturnRef = useRef<THREE.Group>(null);
   const cloudRef = useRef<THREE.Mesh>(null);
   const blackHoleRef = useRef<THREE.Group>(null);
@@ -284,16 +289,16 @@ function Universe() {
   // Textures generated dynamically
   const textures = useMemo(() => {
     return {
-      saturn: createSaturnTexture(),
+      saturn: createSaturnTexture(tier),
     };
-  }, []);
+  }, [tier]);
 
   // Floating moons
   const moonsRef = useRef<THREE.Group>(null);
 
 
   // Asteroid instances — fewer on phone to save draw calls
-  const asteroidCount = phone ? 15 : 120;
+  const asteroidCount = tier === "low" ? 5 : tier === "medium" ? 40 : 120;
   const tempObject = useMemo(() => new THREE.Object3D(), []);
 
   useEffect(() => {
@@ -320,7 +325,7 @@ function Universe() {
   }, [asteroidCount, tempObject]);
 
   // Warp tunnel geometry — reduced line count on phone
-  const warpLineCount = phone ? 50 : 150;
+  const warpLineCount = tier === "low" ? 20 : tier === "medium" ? 60 : 150;
   const warpLines = useMemo(() => {
     const vertices: number[] = [];
     for (let i = 0; i < warpLineCount; i++) {
@@ -398,13 +403,13 @@ function Universe() {
   return (
     <group>
       {/* 1. Living Background (Stars, Nebula, Meteors) */}
-      <LivingBackground phone={phone} />
+      <LivingBackground tier={tier} />
 
       {/* 2. Saturn & Rings */}
       <group ref={saturnRef} position={[0, 0, 0]}>
-        {/* Core sphere — lower segments on phone */}
-        <mesh castShadow={!phone} receiveShadow={!phone}>
-          <sphereGeometry args={[2.0, phone ? 20 : 32, phone ? 20 : 32]} />
+        {/* Core sphere */}
+        <mesh castShadow={tier === "high"} receiveShadow={tier === "high"}>
+          <sphereGeometry args={[2.0, tier === "high" ? 32 : 16, tier === "high" ? 32 : 16]} />
           {textures.saturn ? (
             <meshStandardMaterial
               map={textures.saturn}
@@ -418,7 +423,7 @@ function Universe() {
 
         {/* Atmospheric rim light glow */}
         <mesh>
-          <sphereGeometry args={[2.08, phone ? 16 : 32, phone ? 16 : 32]} />
+          <sphereGeometry args={[2.08, tier === "high" ? 32 : 16, tier === "high" ? 32 : 16]} />
           <meshBasicMaterial 
             color="#e5b05c" 
             transparent 
@@ -430,7 +435,7 @@ function Universe() {
 
         {/* Independent clouds layer */}
         <mesh ref={cloudRef}>
-          <sphereGeometry args={[2.015, phone ? 16 : 32, phone ? 16 : 32]} />
+          <sphereGeometry args={[2.015, tier === "high" ? 32 : 16, tier === "high" ? 32 : 16]} />
           {(textures as any).clouds ? (
             <meshStandardMaterial
               map={(textures as any).clouds}
@@ -453,11 +458,11 @@ function Universe() {
       {/* 2.5 Floating Moons */}
       <group ref={moonsRef}>
         <mesh position={[4.5, 0.8, -2]}>
-          <sphereGeometry args={[0.15, phone ? 8 : 16, phone ? 8 : 16]} />
+          <sphereGeometry args={[0.15, tier === "high" ? 16 : 8, tier === "high" ? 16 : 8]} />
           <meshStandardMaterial color="#9d4edd" roughness={0.8} />
         </mesh>
         <mesh position={[-5, -1.2, 1]}>
-          <sphereGeometry args={[0.08, phone ? 8 : 16, phone ? 8 : 16]} />
+          <sphereGeometry args={[0.08, tier === "high" ? 16 : 8, tier === "high" ? 16 : 8]} />
           <meshStandardMaterial color="#e5b05c" roughness={0.7} />
         </mesh>
       </group>
@@ -484,13 +489,13 @@ function Universe() {
       <group ref={blackHoleRef} position={[40, -20, -35]}>
         {/* The Event Horizon (Pitch Black Sphere) */}
         <mesh>
-          <sphereGeometry args={[3, phone ? 24 : 64, phone ? 24 : 64]} />
+          <sphereGeometry args={[3, tier === "high" ? 64 : 24, tier === "high" ? 64 : 24]} />
           <meshBasicMaterial color="#000000" />
         </mesh>
         
         {/* Photon Sphere / Halo (Subtle glow right at the edge) */}
         <mesh>
-          <sphereGeometry args={[3.12, phone ? 24 : 64, phone ? 24 : 64]} />
+          <sphereGeometry args={[3.12, tier === "high" ? 64 : 24, tier === "high" ? 64 : 24]} />
           <meshBasicMaterial color="#ff7700" transparent opacity={0.12} blending={THREE.AdditiveBlending} side={THREE.BackSide} />
         </mesh>
 
@@ -506,9 +511,11 @@ function Universe() {
 
 export function SpaceScene() {
   const reduced = useReducedMotion();
-  const phone = useIsPhone();
-  // Phone starts at DPR 1 (never above 1.5) to guarantee smooth 60fps
-  const [dpr, setDpr] = useState(phone ? 1 : 1.5);
+  const tier = usePerformanceTier();
+  const isMobile = tier !== "high";
+  
+  // High tier gets full DPR up to 2. Medium/Low start at 1 to guarantee 60fps.
+  const [dpr, setDpr] = useState(isMobile ? 1 : 1.5);
 
   // If prefers-reduced-motion is active, disable WebGL elements for accessibility.
   if (reduced) return null;
@@ -516,7 +523,7 @@ export function SpaceScene() {
   return (
     <div className="pointer-events-none fixed inset-0 -z-10 h-full w-full bg-[#05060f] transition-opacity duration-1000">
       <Canvas
-        shadows={!phone}
+        shadows={tier === "high"}
         dpr={dpr}
         gl={{
           antialias: false,
@@ -530,20 +537,20 @@ export function SpaceScene() {
           // Disable logarithmic depth to avoid precision issues on Android Mali/Adreno.
           logarithmicDepthBuffer: false,
         }}
-        camera={{ fov: phone ? 55 : 45, near: 0.1, far: 200, position: [0, 2, 9] }}
+        camera={{ fov: isMobile ? 55 : 45, near: 0.1, far: 200, position: [0, 2, 9] }}
       >
         <PerformanceMonitor
-          onIncline={() => setDpr(phone ? 1.25 : 2)}
-          onDecline={() => setDpr(phone ? 0.75 : 1)}
+          onIncline={() => setDpr(isMobile ? 1.25 : 2)}
+          onDecline={() => setDpr(isMobile ? 0.75 : 1)}
         />
         <ambientLight intensity={0.12} />
         <directionalLight
           position={[10, 5, 5]}
           intensity={4.2}
           color="#fff5ea"
-          castShadow={!phone}
-          shadow-mapSize-width={phone ? 256 : 1024}
-          shadow-mapSize-height={phone ? 256 : 1024}
+          castShadow={tier === "high"}
+          shadow-mapSize-width={tier === "high" ? 1024 : 256}
+          shadow-mapSize-height={tier === "high" ? 1024 : 256}
           shadow-bias={-0.0005}
         />
         <CameraController />

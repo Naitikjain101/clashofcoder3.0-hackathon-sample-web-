@@ -19,6 +19,7 @@ import { CustomCursor } from "@/components/space/CustomCursor";
 import { GlitchOverlay } from "@/components/space/GlitchOverlay";
 import { AudioProvider } from "@/lib/audio";
 import { ReactLenis } from "lenis/react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const TITLE = "Clash of Coders 3.0 — 24-Hour Hackathon, Jaipur";
 const DESCRIPTION =
@@ -46,7 +47,9 @@ function Index() {
           <CustomCursor />
           <GlitchOverlay />
           <Suspense fallback={null}>
-            <SpaceScene />
+            <ErrorBoundary>
+              <SpaceScene />
+            </ErrorBoundary>
             <Starfield />
           </Suspense>
           <div className="grain-overlay" aria-hidden />

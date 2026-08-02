@@ -1,7 +1,7 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useIsPhone } from "@/hooks/use-prefs";
+import { usePerformanceTier } from "@/hooks/use-performance";
 
 // 1. Procedural 1D High-Res Texture for the Dense Ring
 const createHighResRingTexture = () => {
@@ -201,17 +201,17 @@ function DustVolumetrics({ inner, outer, count }: { inner: number, outer: number
 }
 
 export function CinematicRings() {
-  const phone = useIsPhone();
+  const tier = usePerformanceTier();
   
   const texture = useMemo(() => createHighResRingTexture(), []);
   
-  // 250k particles on Desktop, 8k on Phone (dramatically reduced to prevent lag)
-  const particleCount = phone ? 8000 : 250000;
+  // High: 250k. Medium: 10k. Low: 300.
+  const particleCount = tier === "high" ? 250000 : tier === "medium" ? 10000 : 300;
 
   return (
     <group>
       {/* The solid, mathematically perfect base layer */}
-      <DenseRingDisk inner={2.2} outer={5.5} texture={texture} segments={phone ? 64 : 256} />
+      <DenseRingDisk inner={2.2} outer={5.5} texture={texture} segments={tier === "high" ? 256 : tier === "medium" ? 64 : 32} />
       
       {/* The massive point cloud layer for incredible 3D parallax */}
       <DustVolumetrics inner={2.2} outer={5.5} count={particleCount} />

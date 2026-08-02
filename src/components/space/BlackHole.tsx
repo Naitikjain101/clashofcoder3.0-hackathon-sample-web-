@@ -1,22 +1,23 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useIsPhone } from "@/hooks/use-prefs";
+import { usePerformanceTier, PerformanceTier } from "@/hooks/use-performance";
 
 // 1. Procedural 1D High-Res Texture for the Accretion Disk
-const createBlackHoleAccretionTexture = () => {
+const createBlackHoleAccretionTexture = (tier: PerformanceTier) => {
   if (typeof document === "undefined") return null;
   const canvas = document.createElement("canvas");
-  canvas.width = 4096;
+  const size = tier === "high" ? 4096 : tier === "medium" ? 1024 : 512;
+  canvas.width = size;
   canvas.height = 1;
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  const imgData = ctx.createImageData(4096, 1);
+  const imgData = ctx.createImageData(size, 1);
   const data = imgData.data;
 
-  for (let i = 0; i < 4096; i++) {
-    const t = i / 4096;
+  for (let i = 0; i < size; i++) {
+    const t = i / size;
     let op = 0;
     let r = 255, g = 255, b = 255;
     
@@ -186,20 +187,20 @@ function PlasmaVolumetrics({ inner, outer, count, speed = 1.0 }: { inner: number
 }
 
 export function BlackHoleAccretion() {
-  const phone = useIsPhone();
+  const tier = usePerformanceTier();
   
-  const texture = useMemo(() => createBlackHoleAccretionTexture(), []);
+  const texture = useMemo(() => createBlackHoleAccretionTexture(tier), [tier]);
   
-  // Phone: 0.08x multiplier vs Desktop: 1x — scaled down ~40% from original
-  const mult = phone ? 0.06 : 0.6;
+  // High: 1x, Medium: 0.1x, Low: 0.005x (Drastic reduction to prevent WebGL lockups)
+  const mult = tier === "high" ? 1.0 : tier === "medium" ? 0.08 : 0.005;
 
   return (
     <group>
-      <AccretionDiskBase inner={3.12} outer={13.2} texture={texture} segments={phone ? 64 : 256} />
+      <AccretionDiskBase inner={3.12} outer={13.2} texture={texture} segments={tier === "high" ? 256 : tier === "medium" ? 64 : 32} />
       {/* Differential Rotation: Inner parts spin much faster than outer parts */}
-      <PlasmaVolumetrics inner={3.12} outer={4.5} count={Math.round(50000 * mult)} speed={0.5} />
-      <PlasmaVolumetrics inner={4.5} outer={7.2} count={Math.round(35000 * mult)} speed={0.24} />
-      <PlasmaVolumetrics inner={7.2} outer={13.2} count={Math.round(25000 * mult)} speed={0.08} />
+      <PlasmaVolumetrics inner={3.12} outer={4.5} count={Math.max(100, Math.round(50000 * mult))} speed={0.5} />
+      <PlasmaVolumetrics inner={4.5} outer={7.2} count={Math.max(50, Math.round(35000 * mult))} speed={0.24} />
+      <PlasmaVolumetrics inner={7.2} outer={13.2} count={Math.max(50, Math.round(25000 * mult))} speed={0.08} />
     </group>
   );
 }
